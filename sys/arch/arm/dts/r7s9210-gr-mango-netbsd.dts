@@ -1,0 +1,28 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * GR-MANGO device tree for NetBSD.
+ */
+
+#include "r7s9210-gr-mango.dts"
+
+/ {
+	chosen {
+		/* U-Boot replaces this with its "bootargs" variable. */
+		bootargs = "root=ld0a";
+	};
+
+	/*
+	 * Both memory banks in a single node: the OctaRAM, which the boot
+	 * loader has to set up (8 MiB of it: the controller drops address
+	 * bit 23), and the on-chip RAM. U-Boot rewrites the "reg" of the
+	 * first memory node only, with the same two banks; a second node
+	 * would be left in place and list the on-chip RAM twice.
+	 */
+	/delete-node/ memory@80000000;
+
+	memory@60000000 {
+		device_type = "memory";
+		reg = <0x60000000 0x00800000>,
+		      <0x80000000 0x00400000>;
+	};
+};

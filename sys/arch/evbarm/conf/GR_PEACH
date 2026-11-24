@@ -1,0 +1,74 @@
+#
+#	GR_PEACH -- Renesas RZ/A1H (R7S72100) board with 10MiB on-chip RAM
+#
+#	The whole system has to fit into the 10MiB internal RAM, so this
+#	configuration is kept as small as possible.
+#
+
+include	"arch/evbarm/conf/std.generic"
+include	"arch/evbarm/conf/files.rza1"
+
+no options 	MODULAR
+no options 	MODULAR_DEFAULT_AUTOLOAD
+no options 	CHILD_MAX
+no options 	OPEN_MAX
+
+options 	CPU_CORTEX
+options 	SOC_R7S72100
+
+maxusers	2
+options 	RTC_OFFSET=0
+options 	MSGBUFSIZE=8192
+options 	NBUF=32
+options 	BUFPAGES=64
+options 	FDT_BUF_SIZE=65536	# the default 512KiB is too large
+
+options 	EARLYCONS=rza1, CONSADDR=0xe8008000	# early console on SCIF2
+#options 	VERBOSE_INIT_ARM
+options 	DDB
+options 	DDB_ONPANIC=1
+makeoptions	COPY_SYMTAB=1		# symbol names in DDB (bring-up only)
+
+options 	INET
+
+file-system 	FFS
+file-system 	MSDOSFS
+file-system 	PTYFS
+file-system 	PROCFS
+options 	FFS_NO_SNAPSHOT
+
+config		netbsd		root on ? type ?
+
+armfdt0 	at root
+simplebus*	at fdt? pass 0
+
+cpus*		at fdt? pass 0
+cpu*		at fdt? pass 0
+
+fclock* 	at fdt? pass 1
+ffclock* 	at fdt? pass 1
+rza1cpg* 	at fdt? pass 1
+
+gic* 		at fdt? pass 1		# ARM PL390 GIC
+armgic0 	at gic?
+l2cc* 		at fdt? pass 2		# ARM L2C-310
+arml2cc* 	at l2cc?
+
+rza1ostm* 	at fdt? pass 2
+
+rza1pinctrl* 	at fdt? pass 2
+
+scif* 		at fdt?
+
+rza1rspi* 	at fdt?
+sdmmc* 		at sdmmcbus?
+ld* 		at sdmmc?
+
+rza1eth* 	at fdt?
+smscphy* 	at mii? phy ?		# SMSC LAN8710A
+ukphy* 		at mii? phy ?
+
+pseudo-device	pty
+pseudo-device	loop
+pseudo-device	bpfilter
+pseudo-device	drvctl

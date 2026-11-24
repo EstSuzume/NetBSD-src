@@ -1,0 +1,40 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * GR-PEACH device tree for NetBSD.
+ *
+ * Built on top of the Linux-derived r7s72100-gr-peach.dts shipped in the
+ * NetBSD source tree (sys/external/gpl2/dts).
+ */
+
+#include "r7s72100-gr-peach.dts"
+
+/ {
+	chosen {
+		/* U-Boot replaces this with its "bootargs" variable. */
+		bootargs = "root=ld0a";
+	};
+};
+
+&pinctrl {
+	/* microSD slot on RSPI2: P8_3 RSPCK2, P8_5 MOSI2, P8_6 MISO2 */
+	spi2_pins: spi2 {
+		pinmux = <RZA1_PINMUX(8, 3, 3)>,
+			 <RZA1_PINMUX(8, 5, 3)>,
+			 <RZA1_PINMUX(8, 6, 3)>;
+	};
+};
+
+&spi2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi2_pins>;
+	cs-gpios = <&port8 4 GPIO_ACTIVE_LOW>;
+	status = "okay";
+
+	mmc@0 {
+		compatible = "mmc-spi-slot";
+		reg = <0>;
+		spi-max-frequency = <16000000>;
+		voltage-ranges = <3200 3400>;
+		cd-gpios = <&port7 8 GPIO_ACTIVE_LOW>;
+	};
+};

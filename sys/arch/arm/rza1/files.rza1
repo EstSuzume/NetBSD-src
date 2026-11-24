@@ -1,0 +1,35 @@
+#
+# Configuration info for Renesas RZ/A1 SoCs
+#
+
+file	arch/arm/rza1/rza1_platform.c		soc_rza1
+
+defflag	opt_soc.h				SOC_RZA1
+defflag	opt_soc.h				SOC_R7S72100: SOC_RZA1
+
+device	rza1cpg: fdt_clock
+attach	rza1cpg at fdt with rza1_cpg
+file	arch/arm/rza1/rza1_cpg.c		rza1_cpg
+
+device	rza1ostm
+attach	rza1ostm at fdt with rza1_ostm
+file	arch/arm/rza1/rza1_ostm.c		rza1_ostm
+
+device	scif: tty
+attach	scif at fdt with rza1_scif: fdt_clock
+file	arch/arm/rza1/rza1_scif.c		rza1_scif
+# 113 is free in the MD range (<= 143) of majors.arm32.
+device-major	scif		char 113		scif
+
+device	rza1pinctrl: fdt_pinctrl, fdt_gpio
+attach	rza1pinctrl at fdt with rza1_pinctrl
+file	arch/arm/rza1/rza1_pinctrl.c		rza1_pinctrl
+
+include "dev/sdmmc/files.sdspi"
+device	rza1rspi: sdmmcbus, sdspi, fdt_clock, fdt_gpio, fdt_pinctrl
+attach	rza1rspi at fdt with rza1_rspi
+file	arch/arm/rza1/rza1_rspi.c		rza1_rspi
+
+device	rza1eth: ether, ifnet, arp, mii, mii_bitbang, fdt_clock, fdt_gpio, fdt_pinctrl
+attach	rza1eth at fdt with rza1_ether
+file	arch/arm/rza1/rza1_ether.c		rza1_ether

@@ -1,0 +1,46 @@
+#
+# Configuration info for Renesas RZ/A2 SoCs
+#
+
+file	arch/arm/rza2/rza2_platform.c		soc_rza2
+
+defflag	opt_soc.h				SOC_RZA2
+defflag	opt_soc.h				SOC_R7S9210: SOC_RZA2
+
+device	rza2cpg: fdt_clock
+attach	rza2cpg at fdt with rza2_cpg
+file	arch/arm/rza2/rza2_cpg.c		rza2_cpg
+
+device	rza2pinctrl: fdt_pinctrl, fdt_gpio
+attach	rza2pinctrl at fdt with rza2_pinctrl
+file	arch/arm/rza2/rza2_pinctrl.c		rza2_pinctrl
+
+device	rza2ostm
+attach	rza2ostm at fdt with rza2_ostm
+file	arch/arm/rza2/rza2_ostm.c		rza2_ostm
+
+# SCIFA: RZ/G2L register layout
+device	scif: tty
+attach	scif at fdt with rz_scif: fdt_clock
+file	dev/fdt/rz_scif.c			rz_scif
+# Character major of scif(4).  Declared here rather than in
+# arch/arm/conf/majors.arm32 because config(1) puts every device-major it
+# sees into devsw_conv0[] of every arm32 kernel; only RZ/A kernels need it.
+# 113 is free in the MD range (< 144) of majors.arm32 (RZ/A1 uses it too).
+device-major	scif		char 113		scif
+
+# Ethernet: ETHERC + EDMACa, one instance per channel
+device	rza2eth: ether, ifnet, arp, mii, mii_bitbang, fdt_clock, fdt_gpio, fdt_pinctrl
+attach	rza2eth at fdt with rza2_ether
+file	arch/arm/rza2/rza2_ether.c		rza2_ether
+
+# USB 2.0 host: PHY and glue registers next to the generic EHCI/OHCI
+device	rza2usbphy: fdt_phy, fdt_clock
+attach	rza2usbphy at fdt with rza2_usbphy
+file	arch/arm/rza2/rza2_usbphy.c		rza2_usbphy
+
+# SD/MMC host interface (SDHI): RZ/G2L family layout, driver shared with
+# RZ/Five (common/netbsd/rz-sdhi); PIO, polled
+device	rzsdhi: sdmmcbus, fdt_reset
+attach	rzsdhi at fdt with rz_sdhi
+file	dev/fdt/rz_sdhi.c			rz_sdhi

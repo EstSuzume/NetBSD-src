@@ -127,7 +127,9 @@ const uint8_t *fdt_addr_r __attribute__((__section__(".data")));
 
 #include <libfdt.h>
 #include <dev/fdt/fdtvar.h>
+#ifndef FDT_BUF_SIZE
 #define FDT_BUF_SIZE	(512*1024)
+#endif
 static uint8_t fdt_data[FDT_BUF_SIZE];
 
 extern char KERNEL_BASE_phys[];

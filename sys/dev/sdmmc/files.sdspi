@@ -1,0 +1,5 @@
+#
+# SD/MMC host in SPI mode (used by SPI controller drivers)
+#
+define	sdspi
+file	dev/sdmmc/sdspi.c			sdspi

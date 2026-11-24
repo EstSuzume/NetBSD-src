@@ -1,0 +1,84 @@
+#
+#	GR_MANGO -- Renesas RZ/A2M (R7S9210) board with 4MiB of on-chip RAM
+#	and 8MiB of usable OctaRAM
+#
+#	The whole system has to fit into 12MiB, so this configuration is kept small.
+#
+
+include	"arch/evbarm/conf/std.generic"
+include	"arch/evbarm/conf/files.rza2"
+
+no options 	MODULAR
+no options 	MODULAR_DEFAULT_AUTOLOAD
+no options 	CHILD_MAX
+no options 	OPEN_MAX
+
+options 	CPU_CORTEX
+options 	SOC_R7S9210
+
+maxusers	2
+options 	RTC_OFFSET=0
+options 	MSGBUFSIZE=8192
+options 	NBUF=32
+options 	BUFPAGES=64
+options 	FDT_BUF_SIZE=65536	# the default 512KiB is too large
+
+options 	EARLYCONS=rza2, CONSADDR=0xe8009000	# early console on SCIF4
+options 	DDB
+options 	DDB_ONPANIC=1
+makeoptions	COPY_SYMTAB=1		# symbol names in DDB (bring-up only)
+
+options 	INET
+
+file-system 	FFS
+file-system 	MSDOSFS
+file-system 	PTYFS
+file-system 	PROCFS
+options 	FFS_NO_SNAPSHOT
+
+config		netbsd		root on ? type ?
+
+armfdt0 	at root
+simplebus*	at fdt? pass 0
+
+cpus*		at fdt? pass 0
+cpu*		at fdt? pass 0
+
+fclock* 	at fdt? pass 1
+ffclock* 	at fdt? pass 1
+rza2cpg* 	at fdt? pass 1
+
+gic* 		at fdt? pass 1		# ARM GIC-400
+armgic0 	at gic?
+l2cc* 		at fdt? pass 2		# ARM L2C-310
+arml2cc* 	at l2cc?
+
+rza2ostm* 	at fdt? pass 2
+
+rza2pinctrl* 	at fdt? pass 2
+
+scif* 		at fdt?
+
+rza2eth* 	at fdt?
+smscphy* 	at mii? phy ?		# SMSC LAN8710A
+ukphy* 		at mii? phy ?
+
+rza2usbphy* 	at fdt? pass 3
+ehci* 		at fdt?
+ohci* 		at fdt?
+usb* 		at usbus?
+uhub* 		at usb?
+uhub* 		at uhub? port ?
+umass* 		at uhub? port ? configuration ? interface ?
+scsibus* 	at scsi?
+sd* 		at scsibus? target ? lun ?
+ugen* 		at uhub? port ? configuration ? interface ?
+
+rzsdhi* 	at fdt?
+sdmmc* 		at sdmmcbus?
+ld* 		at sdmmc?
+
+pseudo-device	pty
+pseudo-device	loop
+pseudo-device	bpfilter
+pseudo-device	drvctl
